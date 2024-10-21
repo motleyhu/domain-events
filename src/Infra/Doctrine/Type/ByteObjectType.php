@@ -45,7 +45,7 @@ class ByteObjectType extends Type
         return unserialize($value);
     }
 
-    public function getBindingType()
+    public function getBindingType(): ParameterType
     {
         return ParameterType::LARGE_OBJECT;
     }
@@ -54,10 +54,4 @@ class ByteObjectType extends Type
     {
         return self::TYPE;
     }
-
-    public function requiresSQLCommentHint(AbstractPlatform $platform)
-    {
-        return true;
-    }
-
 }

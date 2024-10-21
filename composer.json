@@ -5,9 +5,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "doctrine/dbal": "^3.4 || ^4.0",
+        "doctrine/dbal": "^4.0",
         "doctrine/doctrine-bundle": "^2.8",
-        "doctrine/orm": "^2.15 || ^3.0",
+        "doctrine/orm": "^3.0",
         "nesbot/carbon": "^2.71 || ^3.0",
         "symfony/event-dispatcher": "^6.4 || ^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
