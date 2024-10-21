@@ -191,7 +191,6 @@ composer install --dev
 
 ```bash
 vendor/bin/phpunit
-vendor/bin/phpspec run
 ```
 
 ## TODO
