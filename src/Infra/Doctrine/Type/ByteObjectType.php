@@ -5,12 +5,12 @@ namespace Lingoda\DomainEventsBundle\Infra\Doctrine\Type;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Types\ObjectType;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * Workaround for https://github.com/doctrine/orm/issues/4029
  */
-class ByteObjectType extends ObjectType
+class ByteObjectType extends Type
 {
     public const TYPE = 'byte_object';
 
@@ -21,7 +21,7 @@ class ByteObjectType extends ObjectType
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
-        $value = (string) parent::convertToDatabaseValue($value, $platform);
+        $value = serialize($value);
 
         if (is_a($platform, PostgreSQLPlatform::class)) {
             $value = str_replace(chr(0), '\0', $value);
@@ -42,10 +42,10 @@ class ByteObjectType extends ObjectType
             $value = str_replace('\0', chr(0), $value);
         }
 
-        return parent::convertToPHPValue($value, $platform);
+        return unserialize($value);
     }
 
-    public function getBindingType(): int
+    public function getBindingType()
     {
         return ParameterType::LARGE_OBJECT;
     }
@@ -54,4 +54,10 @@ class ByteObjectType extends ObjectType
     {
         return self::TYPE;
     }
+
+    public function requiresSQLCommentHint(AbstractPlatform $platform)
+    {
+        return true;
+    }
+
 }
