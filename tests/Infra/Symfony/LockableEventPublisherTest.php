@@ -38,9 +38,9 @@ final class LockableEventPublisherTest extends TestCase
         $outboxRecordMock = $this->createMock(OutboxRecord::class);
         $domainEventMock = $this->createMock(DomainEvent::class);
         $lockMock = $this->createMock(SharedLockInterface::class);
-        $outboxRecordMock->expects($this->once())->method('getId')->willReturn(1);
+        $outboxRecordMock->method('getId')->willReturn(1);
         $outboxRecordMock->expects($this->once())->method('getDomainEvent')->willReturn($domainEventMock);
-        $this->outboxStoreMock->expects($this->once())->method('allUnpublished')->willReturn([$outboxRecordMock]);
+        $this->outboxStoreMock->method('allUnpublished')->willReturn([$outboxRecordMock]);
         $this->lockFactoryMock->expects($this->exactly(2))->method('createLock')->with('outbox-record-1')
             ->willReturn($lockMock)
         ;

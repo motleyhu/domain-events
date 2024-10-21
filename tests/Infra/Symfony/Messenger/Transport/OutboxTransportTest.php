@@ -22,8 +22,8 @@ use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 
 final class OutboxTransportTest extends TestCase
 {
-    private MockObject $entityManagerMock;
-    private MockObject $outboxRecordRepositoryMock;
+    private MockObject&EntityManagerInterface $entityManagerMock;
+    private MockObject&OutboxRecordRepository $outboxRecordRepositoryMock;
     private OutboxTransport $outboxTransport;
 
     protected function setUp(): void
