@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Lingoda\DomainEventsBundle\Domain\Model\Traits;
 
 use Carbon\CarbonImmutable;
+use Stringable;
 
 // @phpstan-ignore-next-line Only used in userland
 trait DomainEventTrait
 {
-    private string $entityId;
-    private CarbonImmutable $occurredAt;
+    private readonly Stringable $entityId;
+    private readonly CarbonImmutable $occurredAt;
 
-    public function getEntityId(): string
+    public function getEntityId(): Stringable
     {
         return $this->entityId;
     }
@@ -22,7 +23,7 @@ trait DomainEventTrait
         return $this->occurredAt;
     }
 
-    protected function init(string $entityId): void
+    protected function init(Stringable $entityId): void
     {
         $this->entityId = $entityId;
         $this->occurredAt = CarbonImmutable::now();

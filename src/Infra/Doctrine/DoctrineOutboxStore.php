@@ -34,7 +34,11 @@ final class DoctrineOutboxStore implements OutboxStore
     {
         $this->eventDispatcher->dispatch(new PreAppendEvent($domainEvent));
 
-        $outboxRecord = new OutboxRecord($domainEvent->getEntityId(), $domainEvent, $domainEvent->getOccurredAt());
+        $outboxRecord = new OutboxRecord(
+            (string) $domainEvent->getEntityId(),
+            $domainEvent,
+            $domainEvent->getOccurredAt(),
+        );
 
         $this->entityManager->persist($outboxRecord);
     }
