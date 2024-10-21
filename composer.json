@@ -16,8 +16,8 @@
         "webmozart/assert": "^1.10"
     },
     "require-dev": {
+        "motley/ecs-config": "^2.1",
         "nyholm/symfony-bundle-test": "^3.0",
-        "phpspec/phpspec": "^7.5",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^1.12",
         "phpstan/phpstan-doctrine": "^1.5",

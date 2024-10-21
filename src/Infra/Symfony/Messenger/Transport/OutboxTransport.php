@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Infra\Symfony\Messenger\Transport;
 
@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Throwable;
 
 final class OutboxTransport implements TransportInterface, MessageCountAwareInterface
 {
@@ -26,7 +27,6 @@ final class OutboxTransport implements TransportInterface, MessageCountAwareInte
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        /** @var OutboxRecordRepository $outboxRecordRepo */
         $outboxRecordRepo = $entityManager->getRepository(OutboxRecord::class);
 
         $this->outboxRecordRepo = $outboxRecordRepo;
@@ -36,6 +36,7 @@ final class OutboxTransport implements TransportInterface, MessageCountAwareInte
     public function get(): iterable
     {
         $this->entityManager->beginTransaction();
+
         try {
             $outboxRecord = $this->outboxRecordRepo->fetchNextRecordForUpdate();
             if ($outboxRecord) {
@@ -51,11 +52,12 @@ final class OutboxTransport implements TransportInterface, MessageCountAwareInte
             // Problem with concurrent consumers and database deadlocks
             if (++$this->retryingSafetyCounter >= self::MAX_RETRIES) {
                 $this->retryingSafetyCounter = 0; // reset counter
+
                 throw new TransportException($exception->getMessage(), 0, $exception);
             }
 
             return [];
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             $this->entityManager->rollback();
 
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -100,6 +102,7 @@ final class OutboxTransport implements TransportInterface, MessageCountAwareInte
     private function deleteOutboxRecord(Envelope $envelope): void
     {
         $this->entityManager->beginTransaction();
+
         try {
             $outboxRecordId = $this->findOutboxReceivedStamp($envelope)->getId();
             $this->outboxRecordRepo->deleteRecord($outboxRecordId);
@@ -108,6 +111,7 @@ final class OutboxTransport implements TransportInterface, MessageCountAwareInte
             $this->entityManager->rollback();
         } catch (LogicException|DBALException $exception) {
             $this->entityManager->rollback();
+
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
     }
@@ -117,7 +121,6 @@ final class OutboxTransport implements TransportInterface, MessageCountAwareInte
      */
     private function findOutboxReceivedStamp(Envelope $envelope): OutboxReceivedStamp
     {
-        /** @var OutboxReceivedStamp|null $outboxReceivedStamp */
         $outboxReceivedStamp = $envelope->last(OutboxReceivedStamp::class);
 
         if (null === $outboxReceivedStamp) {

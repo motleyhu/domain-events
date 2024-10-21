@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Tests;
 
@@ -30,8 +30,8 @@ final class BundleInitializationTest extends KernelTestCase
      */
     protected static function createKernel(array $options = []): KernelInterface
     {
-        /** @var TestKernel $kernel */
         $kernel = parent::createKernel($options);
+        self::assertInstanceOf(TestKernel::class, $kernel);
         $kernel->addTestBundle(LingodaDomainEventsBundle::class);
         $kernel->addTestBundle(DoctrineBundle::class);
         $kernel->addTestConfig(__DIR__ . '/config.yaml');

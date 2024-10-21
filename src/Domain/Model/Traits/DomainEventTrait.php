@@ -1,11 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Domain\Model\Traits;
 
 use Carbon\CarbonImmutable;
 
+// @phpstan-ignore-next-line Only used in userland
 trait DomainEventTrait
 {
     private string $entityId;

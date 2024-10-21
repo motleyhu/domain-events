@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lingoda\DomainEventsBundle\Infra\Doctrine\Type;
 
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Types\Type;
+use Webmozart\Assert\Assert;
 
 /**
  * Workaround for https://github.com/doctrine/orm/issues/4029
@@ -24,22 +27,23 @@ class ByteObjectType extends Type
         $value = serialize($value);
 
         if (is_a($platform, PostgreSQLPlatform::class)) {
-            $value = str_replace(chr(0), '\0', $value);
+            $value = str_replace(\chr(0), '\0', $value);
         }
 
         return $value;
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform): ?object
+    public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
         if ($value === null) {
             return null;
         }
 
-        $value = is_resource($value) ? stream_get_contents($value) : $value;
+        $value = \is_resource($value) ? stream_get_contents($value) : $value;
+        Assert::string($value);
 
         if (is_a($platform, PostgreSQLPlatform::class)) {
-            $value = str_replace('\0', chr(0), $value);
+            $value = str_replace('\0', \chr(0), $value);
         }
 
         return unserialize($value);

@@ -1,20 +1,22 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\DependencyInjection;
 
+use Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Webmozart\Assert\Assert;
 
 final class LingodaDomainEventsExtension extends Extension
 {
     /**
      * @param array<string, mixed> $configs
-     * @throws \Exception
+     * @throws Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -29,21 +31,24 @@ final class LingodaDomainEventsExtension extends Extension
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param mixed[] $config
      */
     private function useCustomMessageBusIfSpecified(array $config, ContainerBuilder $container): void
     {
         if (isset($config['message_bus_name'])) {
+            $messageBusName = $config['message_bus_name'];
+            Assert::string($messageBusName);
+
             $definition = $container->getDefinition('lingoda_domain_events.domain_event_dispatcher_service');
-            $definition->replaceArgument(0, new Reference($config['message_bus_name']));
+            $definition->replaceArgument(0, new Reference($messageBusName));
 
             $definition = $container->getDefinition('lingoda_domain_events.outbox_message_handler');
-            $definition->replaceArgument(1, $config['message_bus_name']);
+            $definition->replaceArgument(1, $messageBusName);
         }
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param mixed[] $config
      */
     private function configureEventPublishingSubscriber(array $config, ContainerBuilder $container): void
     {

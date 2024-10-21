@@ -19,6 +19,13 @@ repos:
 
   - repo: local
     hooks:
+      - id: ecs
+        name: EasyCodingStandard
+        language: system
+        entry: vendor/bin/ecs check --fix
+        files: \.php$
+        pass_filenames: false
+
       - id: composer-validate
         name: Validate project composer
         language: system
@@ -32,23 +39,18 @@ repos:
         entry: php -l
         files: \.php$
 
-      - id: phpspec
-        name: phpspec
-        language: system
-        pass_filenames: false
-        entry: vendor/bin/phpspec run
-        files: \.php$
-
       - id: src-phpstan
         name: domain-events src phpstan
         language: system
         entry: vendor/bin/phpstan analyse
         args: ['-c', './phpstan.neon']
         files: ^src\/.*\.php$
+        pass_filenames: false
 
       - id: tests-phpstan
         name: domain-events tests phpstan
         language: system
         entry: vendor/bin/phpstan analyse
-        args: ['-c', './phpstan.tests.neon']
+        args: ['-c', './phpstan.test.neon']
         files: ^tests\/.*\.php$
+        pass_filenames: false

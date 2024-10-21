@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Infra\Doctrine\Entity;
 
@@ -11,7 +11,7 @@ use Lingoda\DomainEventsBundle\Infra\Doctrine\Repository\OutboxRecordRepository;
 use Webmozart\Assert\Assert;
 
 #[ORM\Entity(repositoryClass: OutboxRecordRepository::class)]
-#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Table(name: OutboxRecord::TABLE_NAME)]
 #[ORM\Index(name: 'entity_type_published_idx', columns: ['entityId', 'eventType', 'publishedOn'])]
 #[ORM\Index(name: 'occurred_published_idx', columns: ['occurredAt', 'publishedOn'])]
 class OutboxRecord
@@ -21,7 +21,7 @@ class OutboxRecord
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: 'bigint')]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private string $id;
+    private int $id;
 
     #[ORM\Column(name: 'eventType', type: 'string', nullable: false)]
     private string $eventType;
@@ -41,10 +41,10 @@ class OutboxRecord
     public function __construct(
         string $entityId,
         DomainEvent $domainEvent,
-        CarbonImmutable $occurredAt
+        CarbonImmutable $occurredAt,
     ) {
         $this->entityId = $entityId;
-        $this->eventType = \get_class($domainEvent);
+        $this->eventType = $domainEvent::class;
         $this->domainEvent = $domainEvent;
         $this->occurredAt = $occurredAt;
         $this->publishedOn = null;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Infra\Symfony\EventSubscriber;
 
@@ -25,7 +25,7 @@ final class PublishDomainEventsSubscriber implements EventSubscriberInterface
 
     public function __construct(
         EventPublisher $eventPublisher,
-        bool $enabled
+        bool $enabled,
     ) {
         $this->eventPublisher = $eventPublisher;
         $this->enabled = $enabled;

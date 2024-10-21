@@ -1,13 +1,15 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Infra\Symfony\Messenger;
 
+use RuntimeException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Throwable;
 
 #[AsMessageHandler]
 final class OutboxMessageHandler
@@ -26,12 +28,10 @@ final class OutboxMessageHandler
         try {
             $this->routableMessageBus->dispatch(
                 Envelope::wrap($outboxMessage->getDomainEvent())
-                    ->with(
-                        new BusNameStamp($this->busName)
-                    )
+                    ->with(new BusNameStamp($this->busName)),
             );
-        } catch (\Throwable $e) {
-            throw new \RuntimeException('Failed to dispatch domain event', 0, $e);
+        } catch (Throwable $e) {
+            throw new RuntimeException('Failed to dispatch domain event', 0, $e);
         }
     }
 }
