@@ -14,7 +14,7 @@ composer req lingoda/domain-events
 lingoda_domain_events:
     message_bus_name: 'event.bus'
 
-    // default is false, you can turn on event publishing on Kernel, Console and WorkerMessageHandledEvent events, usefull in test environment
+    # default is false, you can turn on event publishing on Kernel, Console and WorkerMessageHandledEvent events, useful in test environment
     enable_event_publisher: true
 ```
 
