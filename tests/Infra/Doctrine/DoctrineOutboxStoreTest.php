@@ -43,12 +43,9 @@ final class DoctrineOutboxStoreTest extends TestCase
         );
         $this->entityManagerMock->expects($this->once())->method('getUnitOfWork')->willReturn($unitOfWorkMock);
         $this->entityManagerMock->expects($this->once())->method('persist')->with(
-            $this->callback(static function (OutboxRecord $outboxRecord): bool {
-                $this->assertSame('entity-id', $outboxRecord->getEntityId());
-                $this->assertSame(null, $outboxRecord->getPublishedOn());
-
-                return true;
-            }),
+            $this->callback(
+                static fn (OutboxRecord $outboxRecord): bool => $outboxRecord->getEntityId() === 'entity-id' && $outboxRecord->getPublishedOn() === null,
+            ),
         );
         $this->doctrineOutboxStore->append($domainEventMock);
     }
@@ -69,11 +66,9 @@ final class DoctrineOutboxStoreTest extends TestCase
         );
         $this->entityManagerMock->expects($this->once())->method('getUnitOfWork')->willReturn($unitOfWorkMock);
         $this->entityManagerMock->expects($this->exactly(2))->method('persist')->with(
-            $this->callback(static function (OutboxRecord $outboxRecordMock): bool {
-                $this->assertSame(null, $outboxRecordMock->getPublishedOn());
-
-                return true;
-            }),
+            $this->callback(
+                static fn (OutboxRecord $outboxRecordMock): bool => $outboxRecordMock->getPublishedOn() === null,
+            ),
         );
         // replace call
         $replaceableDomainEventMock->expects($this->once())->method('getEntityId')->willReturn('replaceable-entity-id');

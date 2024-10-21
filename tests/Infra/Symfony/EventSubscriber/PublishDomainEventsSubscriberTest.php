@@ -24,7 +24,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 
 final class PublishDomainEventsSubscriberTest extends TestCase
 {
-    private MockObject $eventPublisherMock;
+    private MockObject&EventPublisher $eventPublisherMock;
     private PublishDomainEventsSubscriber $publishDomainEventsSubscriber;
 
     protected function setUp(): void
@@ -35,12 +35,14 @@ final class PublishDomainEventsSubscriberTest extends TestCase
 
     public function testInitializable(): void
     {
-        $this->assertInstanceOf(PublishDomainEventsSubscriber::class, $this->publishDomainEventsSubscriber);
-        $this::getSubscribedEvents()->shouldIterateLike([
-            KernelEvents::TERMINATE => 'publishEventsFromHttp',
-            ConsoleEvents::TERMINATE => 'publishEventsFromConsole',
-            WorkerMessageHandledEvent::class => 'publishEventsFromWorker',
-        ]);
+        self::assertEquals(
+            [
+                KernelEvents::TERMINATE => 'publishEventsFromHttp',
+                ConsoleEvents::TERMINATE => 'publishEventsFromConsole',
+                WorkerMessageHandledEvent::class => 'publishEventsFromWorker',
+            ],
+            $this->publishDomainEventsSubscriber->getSubscribedEvents(),
+        );
     }
 
     public function testPublishEventOnHttpTermination(): void

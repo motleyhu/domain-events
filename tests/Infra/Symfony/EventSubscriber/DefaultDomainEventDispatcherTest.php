@@ -40,7 +40,7 @@ final class DefaultDomainEventDispatcherTest extends TestCase
             ->willThrowException(new Exception())
         ;
         $this->expectException(RuntimeException::class);
-        $this->defaultDomainEventDispatcher->expectExceptionMessage('Failed to dispatch domain event');
+        $this->expectExceptionMessage('Failed to dispatch domain event');
         $this->defaultDomainEventDispatcher->dispatch($domainEventMock);
     }
 }

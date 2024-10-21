@@ -30,7 +30,6 @@ final class OutboxRecordTest extends TestCase
 
     public function testInitializable(): void
     {
-        $this->assertInstanceOf(OutboxRecord::class, $this->outboxRecord);
         $this->assertEquals('entity-id', $this->outboxRecord->getEntityId());
         $this->assertEquals($this->domainEventMock, $this->outboxRecord->getDomainEvent());
         $this->assertEquals(true, $this->outboxRecord->getOccurredAt()->eq(CarbonImmutable::now()));
@@ -41,6 +40,8 @@ final class OutboxRecordTest extends TestCase
     {
         $tomorrow = new CarbonImmutable('tomorrow');
         $this->outboxRecord->setPublishedOn($tomorrow);
-        $this->assertTrue($this->outboxRecord->getPublishedOn()->eq($tomorrow));
+        $publishedOn = $this->outboxRecord->getPublishedOn();
+        $this->assertNotNull($publishedOn);
+        $this->assertTrue($publishedOn->eq($tomorrow));
     }
 }

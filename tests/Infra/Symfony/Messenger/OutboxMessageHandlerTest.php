@@ -31,10 +31,10 @@ final class OutboxMessageHandlerTest extends TestCase
         $domainEventMock = $this->createMock(DomainEvent::class);
         $outboxMessageMock->expects($this->once())->method('getDomainEvent')->willReturn($domainEventMock);
         $this->messageBus->expects($this->once())->method('dispatch')->with(
-            $this->callback(function (Envelope $envelope) {
-                $this->assertSame('bus-name', $envelope->last(BusNameStamp::class)->getBusName());
+            $this->callback(static function (Envelope $envelope) {
+                $busNameStamp = $envelope->last(BusNameStamp::class);
 
-                return true;
+                return $busNameStamp !== null && $busNameStamp->getBusName() === 'bus-name';
             }),
         )
             ->willReturn(new Envelope($domainEventMock))

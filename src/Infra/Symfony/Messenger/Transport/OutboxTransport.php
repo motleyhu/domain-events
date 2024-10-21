@@ -33,7 +33,10 @@ final class OutboxTransport implements TransportInterface, MessageCountAwareInte
         $this->entityManager = $entityManager;
     }
 
-    public function get(): iterable
+    /**
+     * @return Envelope[]
+     */
+    public function get(): array
     {
         $this->entityManager->beginTransaction();
 

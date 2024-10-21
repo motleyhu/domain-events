@@ -12,7 +12,6 @@ final class OutboxReceivedStampTest extends TestCase
     public function testInitializable(): void
     {
         $outboxReceivedStamp = new OutboxReceivedStamp(10);
-        $this->assertInstanceOf(OutboxReceivedStamp::class, $outboxReceivedStamp);
         $this->assertEquals(10, $outboxReceivedStamp->getId());
     }
 }

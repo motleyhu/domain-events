@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lingoda\DomainEventsBundle\Tests\Infra\Symfony\Messenger\Transport;
 
 use Carbon\CarbonImmutable;
-use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Lingoda\DomainEventsBundle\Domain\Model\DomainEvent;
 use Lingoda\DomainEventsBundle\Infra\Doctrine\Entity\OutboxRecord;
@@ -71,7 +71,7 @@ final class OutboxTransportTest extends TestCase
         $this->outboxRecordRepositoryMock->expects($this->never())->method('deleteRecord')->with($this->any());
         $envelope = Envelope::wrap($domainEventMock);
         $expectedException = new TransportException('No OutboxReceivedStamp found on the Envelope.');
-        $this->expectException($expectedException);
+        $this->expectExceptionObject($expectedException);
         $this->outboxTransport->reject($envelope);
         /** should not throw exception */
         $this->outboxTransport->ack($envelope);
@@ -84,12 +84,11 @@ final class OutboxTransportTest extends TestCase
         $this->entityManagerMock->expects($this->once())->method('rollback');
         $this->outboxRecordRepositoryMock->expects($this->once())->method('deleteRecord')->with(
             $this->any(),
-        )->willThrowException(DBALException::class);
+        )->willThrowException(new Exception('DBAL error'));
         $envelope = Envelope::wrap($domainEventMock)
             ->with(new OutboxReceivedStamp(1))
         ;
         $this->expectException(TransportException::class);
-        $this->outboxTransport->expectExceptionMessage('');
         $this->outboxTransport->reject($envelope);
         /** should not throw exception */
         $this->outboxTransport->ack($envelope);
@@ -110,46 +109,27 @@ final class OutboxTransportTest extends TestCase
         // fetching a record
         $outboxRecordMock->expects($this->once())->method('getId')->willReturn(1);
         $outboxRecordMock->expects($this->once())->method('getDomainEvent')->willReturn($domainEventMock);
-        $outboxRecordMock->expects($this->once())->method('setPublishedOn')->willReturn(
-            fn (CarbonImmutable $now) => $now->expects($this->once())->method('eq')->with(CarbonImmutable::now()),
-        );
+        $outboxRecordMock->expects($this->once())->method('setPublishedOn')->willReturn(CarbonImmutable::now());
         $records = $this->outboxTransport->get();
         $this->assertCount(1, $records);
-        $records[0]->shouldBeOutboxEnvelope($outboxRecordMock);
+        $this->assertIsOutboxEnvelope($records[0], $outboxRecordMock);
     }
 
-    /**
-     * @return array<string, callable>
-     */
-    public function getMatchers(): array
+    private function assertIsOutboxEnvelope(mixed $subject, OutboxRecord $record): void
     {
-        return [
-            'beOutboxEnvelope' => static function ($subject, $record) {
-                if (!$subject instanceof Envelope) {
-                    return false;
-                }
+        $this->assertInstanceOf(Envelope::class, $subject);
 
-                $message = $subject->getMessage();
-                if (!$message instanceof OutboxMessage) {
-                    return false;
-                }
+        $message = $subject->getMessage();
+        $this->assertInstanceOf(OutboxMessage::class, $message);
 
-                if ($message->getDomainEvent() !== $record->getDomainEvent()) {
-                    return false;
-                }
+        $this->assertSame($message->getDomainEvent(), $record->getDomainEvent());
 
-                $outboxReceivedStamp = $subject->last(OutboxReceivedStamp::class);
-                if ($outboxReceivedStamp === null || $outboxReceivedStamp->getId() !== $record->getId()) {
-                    return false;
-                }
+        $outboxReceivedStamp = $subject->last(OutboxReceivedStamp::class);
+        $this->assertInstanceOf(OutboxReceivedStamp::class, $outboxReceivedStamp);
+        $this->assertSame($outboxReceivedStamp->getId(), $record->getId());
 
-                $transportMessageIdStamp = $subject->last(TransportMessageIdStamp::class);
-                if ($transportMessageIdStamp === null || $transportMessageIdStamp->getId() !== $record->getId()) {
-                    return false;
-                }
-
-                return true;
-            },
-        ];
+        $transportMessageIdStamp = $subject->last(TransportMessageIdStamp::class);
+        $this->assertInstanceOf(TransportMessageIdStamp::class, $transportMessageIdStamp);
+        $this->assertSame($transportMessageIdStamp->getId(), $record->getId());
     }
 }

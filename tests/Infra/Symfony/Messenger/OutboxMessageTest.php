@@ -13,8 +13,7 @@ final class OutboxMessageTest extends TestCase
     public function testInitializable(): void
     {
         $domainEventMock = $this->createMock(DomainEvent::class);
-        $this->outboxMessage = new OutboxMessage($domainEventMock);
-        $this->assertInstanceOf(OutboxMessage::class, $this->outboxMessage);
-        $this->assertEquals($domainEventMock, $this->outboxMessage->getDomainEvent());
+        $outboxMessage = new OutboxMessage($domainEventMock);
+        $this->assertEquals($domainEventMock, $outboxMessage->getDomainEvent());
     }
 }
