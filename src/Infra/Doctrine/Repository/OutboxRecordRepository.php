@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Infra\Doctrine\Repository;
 
@@ -25,7 +25,10 @@ class OutboxRecordRepository extends EntityRepository
             ->getQuery()
         ;
 
-        return (int) $query->execute();
+        $rowCount = $query->execute();
+        Assert::integer($rowCount);
+
+        return $rowCount;
     }
 
     public function purgePublishedEvents(): void
@@ -71,6 +74,6 @@ class OutboxRecordRepository extends EntityRepository
             ->where('o.publishedOn IS NULL')
             ->andWhere('o.occurredAt < :now')
             ->setParameter('now', CarbonImmutable::now())
-            ;
+        ;
     }
 }

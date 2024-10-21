@@ -1,9 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Domain\Model\Traits;
 
+// @phpstan-ignore-next-line Only used in userland
 trait ActorAwareEventTrait
 {
     private ?int $actorId = null;

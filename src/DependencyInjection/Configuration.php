@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\DependencyInjection;
 
@@ -15,10 +15,10 @@ final class Configuration implements ConfigurationInterface
 
         $treeBuilder->getRootNode()
             ->children()
-                ->scalarNode('message_bus_name')
-                    ->defaultValue('messenger.bus.default')
-                ->end()
-                ->booleanNode('enable_event_publisher')->defaultValue(false)->end()
+            ->scalarNode('message_bus_name')
+            ->defaultValue('messenger.bus.default')
+            ->end()
+            ->booleanNode('enable_event_publisher')->defaultValue(false)->end()
             ->end()
         ;
 

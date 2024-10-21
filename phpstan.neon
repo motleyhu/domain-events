@@ -9,14 +9,7 @@ parameters:
             missingCheckedExceptionInThrows: true
             tooWideThrowType: true
         uncheckedExceptionClasses:
-            - RuntimeException # https://www.php.net/manual/en/class.runtimeexception.php
-            - LogicException # https://www.php.net/manual/en/class.logicexception.php
+            - RuntimeException
+            - LogicException
             - Doctrine\DBAL\Exception
-            - Doctrine\ORM\ORMException
-    excludePaths:
-        - src/Domain/Model/Traits/*
-    ignoreErrors:
-        -
-            message: "#^Property Lingoda\\\\DomainEventsBundle\\\\Infra\\\\Doctrine\\\\Entity\\\\OutboxRecord\\:\\:\\$id is never written, only read\\.$#"
-            count: 1
-            path: src/Infra/Doctrine/Entity/OutboxRecord.php
+            - Doctrine\ORM\Exception\ORMException

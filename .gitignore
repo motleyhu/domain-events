@@ -7,3 +7,4 @@ phpunit.xml
 .envrc
 .idea
 .phpstan-cache
+.ecs-cache

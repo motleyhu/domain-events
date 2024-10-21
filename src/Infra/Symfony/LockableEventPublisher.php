@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Infra\Symfony;
 
@@ -22,7 +22,7 @@ final class LockableEventPublisher implements EventPublisher
     public function __construct(
         DomainEventDispatcher $domainEventDispatcher,
         OutboxStore $outboxStore,
-        LockFactory $lockFactory
+        LockFactory $lockFactory,
     ) {
         $this->domainEventDispatcher = $domainEventDispatcher;
         $this->outboxStore = $outboxStore;
@@ -38,14 +38,10 @@ final class LockableEventPublisher implements EventPublisher
 
     private function publishEvent(OutboxRecord $outboxRecord): void
     {
-        $lock = $this->lockFactory->createLock(
-            sprintf('outbox-record-%d', $outboxRecord->getId())
-        );
+        $lock = $this->lockFactory->createLock(\sprintf('outbox-record-%d', $outboxRecord->getId()));
 
         if ($lock->acquire()) {
-            $this->domainEventDispatcher->dispatch(
-                $outboxRecord->getDomainEvent()
-            );
+            $this->domainEventDispatcher->dispatch($outboxRecord->getDomainEvent());
             $this->outboxStore->publish($outboxRecord);
 
             $lock->release();

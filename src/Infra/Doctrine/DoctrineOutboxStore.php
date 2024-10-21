@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Infra\Doctrine;
 
@@ -12,7 +12,6 @@ use Lingoda\DomainEventsBundle\Domain\Model\OutboxStore;
 use Lingoda\DomainEventsBundle\Domain\Model\ReplaceableDomainEvent;
 use Lingoda\DomainEventsBundle\Infra\Doctrine\Entity\OutboxRecord;
 use Lingoda\DomainEventsBundle\Infra\Doctrine\Event\PreAppendEvent;
-use Lingoda\DomainEventsBundle\Infra\Doctrine\Repository\OutboxRecordRepository;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -25,7 +24,7 @@ final class DoctrineOutboxStore implements OutboxStore
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
     ) {
         $this->entityManager = $entityManager;
         $this->eventDispatcher = $eventDispatcher;
@@ -36,9 +35,9 @@ final class DoctrineOutboxStore implements OutboxStore
         $this->eventDispatcher->dispatch(new PreAppendEvent($domainEvent));
 
         $outboxRecord = new OutboxRecord(
-            $domainEvent->getEntityId(),
+            (string) $domainEvent->getEntityId(),
             $domainEvent,
-            $domainEvent->getOccurredAt()
+            $domainEvent->getOccurredAt(),
         );
 
         $this->entityManager->persist($outboxRecord);
@@ -50,7 +49,7 @@ final class DoctrineOutboxStore implements OutboxStore
             $repo = $this->entityManager->getRepository(OutboxRecord::class);
             $replaceableEvents = $repo->findBy([
                 'entityId' => $domainEvent->getEntityId(),
-                'eventType' => \get_class($domainEvent),
+                'eventType' => $domainEvent::class,
                 'publishedOn' => null,
             ]);
 
@@ -72,9 +71,6 @@ final class DoctrineOutboxStore implements OutboxStore
 
     public function purgePublishedEvents(): void
     {
-        /**
-         * @var OutboxRecordRepository $repo
-         */
         $repo = $this->entityManager->getRepository(OutboxRecord::class);
         $repo->purgePublishedEvents();
     }
@@ -91,7 +87,7 @@ final class DoctrineOutboxStore implements OutboxStore
         }
 
         try {
-            $schemaManager = $connection->getSchemaManager();
+            $schemaManager = $connection->createSchemaManager();
             if (!$schemaManager->tablesExist([OutboxRecord::TABLE_NAME])) {
                 return [];
             }
@@ -110,6 +106,7 @@ final class DoctrineOutboxStore implements OutboxStore
             ->setParameter('now', $now)
         ;
 
+        // @phpstan-ignore-next-line Cannot infer generics, cannot assert it.
         return $qb->getQuery()->toIterable();
     }
 }

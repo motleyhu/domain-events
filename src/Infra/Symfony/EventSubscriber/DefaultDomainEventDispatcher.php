@@ -1,12 +1,14 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Lingoda\DomainEventsBundle\Infra\Symfony\EventSubscriber;
 
 use Lingoda\DomainEventsBundle\Domain\Model\DomainEvent;
 use Lingoda\DomainEventsBundle\Domain\Model\DomainEventDispatcher;
+use RuntimeException;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Throwable;
 
 /**
  * Default implementation using event bus
@@ -21,14 +23,14 @@ class DefaultDomainEventDispatcher implements DomainEventDispatcher
     }
 
     /**
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function dispatch(DomainEvent $domainEvent): void
     {
         try {
             $this->eventBus->dispatch($domainEvent);
-        } catch (\Throwable $e) {
-            throw new \RuntimeException('Failed to dispatch domain event', 0, $e);
+        } catch (Throwable $e) {
+            throw new RuntimeException('Failed to dispatch domain event', 0, $e);
         }
     }
 }
